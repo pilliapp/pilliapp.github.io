@@ -19,9 +19,7 @@ var dengue = 1;
 document.addEventListener("DOMContentLoaded", function() {
   spinner = document.getElementById("spin");
   spinner.addEventListener("click", spin);
-  spinner.style = "display: block;";
   canvas = document.getElementById("canvas");
-  canvas.className = "d-none";
 
   textarea = document.getElementById("names");
   textarea.value = options.join('\n');
