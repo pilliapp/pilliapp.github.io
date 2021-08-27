@@ -1,5 +1,5 @@
 
-var options = [];
+var options = ['Naranja', 'Verde', 'Morado'];
 
 var startAngle = 0;
 var arc = Math.PI / (options.length / 2);
