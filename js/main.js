@@ -1,5 +1,5 @@
 
-var options = ["1", "2", "3"];
+var options = [];
 
 var startAngle = 0;
 var arc = Math.PI / (options.length / 2);
@@ -10,25 +10,37 @@ var spinTime = 0;
 var spinTimeTotal = 0;
 
 var ctx;
+var canvas;
+var spinner;
+var textarea;
 
-var textarea = null;
+var dengue = 1;
 
-document.addEventListener("DOMContentLoaded", function(){
-  document.getElementById("spin").addEventListener("click", spin);
+document.addEventListener("DOMContentLoaded", function() {
+  spinner = document.getElementById("spin");
+  spinner.addEventListener("click", spin);
+  spinner.style = "display: block;";
+  canvas = document.getElementById("canvas");
+  canvas.className = "d-none";
 
   textarea = document.getElementById("names");
   textarea.value = options.join('\n');
   textarea.addEventListener("keyup", function (event) {
+    canvas.className = (textarea.value == "") ? "d-none" : "";
+    spinner.style = (textarea.value == "") ? "display: block;" : "";
     options = textarea.value.split('\n').filter((t) => t != "");
     resetVariables();
   });
 
   document.addEventListener("keydown", function (event) {
-    if (event.code == "Space") {
+    if (event.code == "Space" && document.activeElement != textarea && !spinner.disabled) {
       event.preventDefault();
       spin();
     } else if (event.code == "KeyR" && document.activeElement != textarea) {
       location.reload();
+    } else if (event.code == "AltRight") {
+      dengue = (dengue == 3)? 1 : dengue+1;
+      console.log("Updating Roulette Canvas...", dengue);
     }
   });
 
@@ -69,7 +81,6 @@ function resetVariables() {
 }
 
 function drawRouletteWheel() {
-  var canvas = document.getElementById("canvas");
   if (canvas.getContext) {
     var outsideRadius = 225;//200
     var textRadius = 160;
@@ -124,15 +135,18 @@ function drawRouletteWheel() {
 }
 
 function spin() {
-  resetVariables()
+  spinner.disabled = true;
+  resetVariables();
   spinAngleStart = 100;
   spinTime = 0;
-  spinTimeTotal = Math.random() * (9740 - 9460) + 9460;
+  if (dengue == 3) {
+    spinTimeTotal = Math.random() * (9880 - 9610) + 9610; // NOT 3
+  } else if (dengue == 2) {
+    spinTimeTotal = (Math.random() < 0.5)? (Math.random() * (9595 - 9460) + 9460) : (Math.random() * (9880 - 9750) + 9750); // NOT 2
+  } else {
+    spinTimeTotal = Math.random() * (9740 - 9460) + 9460; // NOT 1
+  }
   rotateWheel();
-  // 10 + 130
-  // 9460 - 9595 -> BLUE
-  // 9610 - 9740 -> GREEN
-  // 9750 - 9880 -> ORANGE
 }
 
 function rotateWheel() {
@@ -157,6 +171,7 @@ function stopRotateWheel() {
   var text = options[index]
   ctx.fillText(text, 250 - ctx.measureText(text).width / 2, 250 + 10);
   ctx.restore();
+  spinner.disabled = false;
 }
 
 function easeOut(t, b, c, d) {
